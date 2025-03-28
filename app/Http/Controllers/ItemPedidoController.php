@@ -3,47 +3,63 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\ItemPedido;
+use App\Services\ItemPedidoService;
 use Illuminate\Http\Request;
 
 class ItemPedidoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    private $itemPedidoService;
+
+    public function __construct(ItemPedidoService $itemPedidoService)
+    {
+        $this->itemPedidoService = $itemPedidoService;
+    }
+
     public function index()
     {
-        //
+        return ItemPedido::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate($request, [
+            'pedido_id' => 'required|integer',
+            'cliente_id' => 'required|integer',
+            'produto_id' => 'required|integer',
+            'quantidade' => 'required|integer',
+            'valor_total' => 'required|numeric',
+        ]);
+
+        $itemPedido = $this->itemPedidoService->createItemPedido($request->all());
+
+        return $itemPedido;
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(ItemPedido $itemPedido)
     {
-        //
+        return $itemPedido;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, ItemPedido $itemPedido)
     {
-        //
+        $request->validate($request, [
+            'pedido_id' => 'required|integer',
+            'cliente_id' => 'required|integer',
+            'produto_id' => 'required|integer',
+            'quantidade' => 'required|integer',
+            'valor_total' => 'required|numeric',
+        ]);
+
+        $itemPedido = $this->itemPedidoService->updateItemPedido($itemPedido, $request->all());
+
+        return $itemPedido;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(ItemPedido $itemPedido)
     {
-        //
+        $this->itemPedidoService->delete($itemPedido);
+
+        return response()->json(['message' => 'Item Pedido excluído com sucesso.'], 200);
     }
 }

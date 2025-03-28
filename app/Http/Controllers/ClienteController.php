@@ -3,47 +3,63 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Models\Cliente;
+use App\Services\ClienteService;
 use Illuminate\Http\Request;
 
 class ClienteController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
+    private $clienteService;
+
+    public function __construct(ClienteService $clienteService)
+    {
+        $this->clienteService = $clienteService;
+    }
+
     public function index()
     {
-        //
+        return Cliente::all();
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate($request, [
+            'nome' => 'required|string',
+            'telefone' => 'required|string',
+            'endereco' => 'required|string',
+            'numero' => 'required|string',
+            'bairro' => 'required|string'
+        ]);
+
+        $cliente = $this->clienteService->createCliente($request->all());
+
+        return $cliente;
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show(Cliente $cliente)
     {
-        //
+        return $cliente;
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function update(Request $request, Cliente $cliente)
     {
-        //
+        $request->validate($request, [
+            'nome' => 'required|string',
+            'telefone' => 'required|string',
+            'endereco' => 'required|string',
+            'numero' => 'required|string',
+            'bairro' => 'required|string'
+        ]);
+
+        $cliente = $this->clienteService->updateCliente($cliente, $request->all());
+
+        return $cliente;
     }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
+    public function destroy(Cliente $cliente)
     {
-        //
+        $this->clienteService->delete($cliente);
+
+        return response()->json(['message' => 'Cliente excluído com sucesso.'], 200);
     }
 }
