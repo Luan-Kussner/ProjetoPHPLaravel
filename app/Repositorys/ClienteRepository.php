@@ -23,11 +23,11 @@ class ClienteRepository
 
     public function update(Cliente $cliente, array $data)
     {
-        $cliente->update($data);
+       return $cliente->update($data);
     }
 
     public function delete(Cliente $cliente)
     {
-        $cliente->delete();
+       return $cliente->delete();
     }
 }

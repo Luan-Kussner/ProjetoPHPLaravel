@@ -23,17 +23,17 @@ class ClienteController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate($request, [
+        $request->validate([
             'nome' => 'required|string',
             'telefone' => 'required|string',
             'endereco' => 'required|string',
             'numero' => 'required|string',
             'bairro' => 'required|string'
         ]);
-
+    
         $cliente = $this->clienteService->createCliente($request->all());
-
-        return $cliente;
+    
+        return response()->json($cliente, 201);
     }
 
     public function show(Cliente $cliente)
@@ -43,17 +43,16 @@ class ClienteController extends Controller
 
     public function update(Request $request, Cliente $cliente)
     {
-        $request->validate($request, [
+        $request->validate([
             'nome' => 'required|string',
-            'telefone' => 'required|string',
+            'telefone' => 'required|numeric',
             'endereco' => 'required|string',
-            'numero' => 'required|string',
-            'bairro' => 'required|string'
+            'numero' => 'required|numeric',
+            'bairro' => 'required|numeric',
         ]);
-
+    
         $cliente = $this->clienteService->updateCliente($cliente, $request->all());
-
-        return $cliente;
+        return response()->json($cliente, 200);
     }
 
     public function destroy(Cliente $cliente)
