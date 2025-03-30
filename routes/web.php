@@ -11,7 +11,6 @@ Route::get('/', function () {
 });
 Route::apiResource('/api/v1/produtos', ProdutoController::class);
 Route::apiResource('/api/v1/clientes', ClienteController::class);
-Route::put('api/v1/clientes/{cliente}', [ClienteController::class, 'update']);
 Route::apiResource('/api/v1/pedidos', PedidoController::class)->middleware('auth:api');
 Route::apiResource('/api/v1/pedidos', PedidoController::class);
 Route::apiResource('/api/v1/itens-pedidos', ItemPedidoController::class);

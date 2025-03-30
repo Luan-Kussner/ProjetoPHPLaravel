@@ -41,18 +41,21 @@ class ClienteController extends Controller
         return $cliente;
     }
 
-    public function update(Request $request, Cliente $cliente)
+    public function update(Request $request, $id)
     {
+        $cliente = Cliente::findOrFail($id);
+    
         $request->validate([
-            'nome' => 'required|string',
-            'telefone' => 'required|numeric',
-            'endereco' => 'required|string',
-            'numero' => 'required|numeric',
-            'bairro' => 'required|numeric',
+            'nome' => 'sometimes|string',
+            'telefone' => 'sometimes|string',
+            'endereco' => 'sometimes|string',
+            'numero' => 'sometimes|string',
+            'bairro' => 'sometimes|string'
         ]);
     
-        $cliente = $this->clienteService->updateCliente($cliente, $request->all());
-        return response()->json($cliente, 200);
+        $cliente->update($request->all());
+    
+        return response()->json($cliente);
     }
 
     public function destroy(Cliente $cliente)
