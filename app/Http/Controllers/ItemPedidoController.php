@@ -23,7 +23,7 @@ class ItemPedidoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate($request, [
+        $request->validate([
             'pedido_id' => 'required|integer',
             'cliente_id' => 'required|integer',
             'produto_id' => 'required|integer',
@@ -32,8 +32,8 @@ class ItemPedidoController extends Controller
         ]);
 
         $itemPedido = $this->itemPedidoService->createItemPedido($request->all());
-
-        return $itemPedido;
+        
+        return response()->json($itemPedido, 201);
     }
 
     public function show(ItemPedido $itemPedido)
@@ -41,19 +41,21 @@ class ItemPedidoController extends Controller
         return $itemPedido;
     }
 
-    public function update(Request $request, ItemPedido $itemPedido)
+    public function update(Request $request, $id)
     {
-        $request->validate($request, [
-            'pedido_id' => 'required|integer',
-            'cliente_id' => 'required|integer',
-            'produto_id' => 'required|integer',
-            'quantidade' => 'required|integer',
-            'valor_total' => 'required|numeric',
+        $itemPedido = ItemPedido::findOrFail($id);
+
+        $request->validate([
+            'pedido_id' => 'sometimes|integer',
+            'cliente_id' => 'sometimes|integer',
+            'produto_id' => 'sometimes|integer',
+            'quantidade' => 'sometimes|integer',
+            'valor_total' => 'sometimes|numeric',
         ]);
 
-        $itemPedido = $this->itemPedidoService->updateItemPedido($itemPedido, $request->all());
-
-        return $itemPedido;
+        $itemPedido->update($request->all());
+        
+        return response()->json($itemPedido);
     }
 
     public function destroy(ItemPedido $itemPedido)

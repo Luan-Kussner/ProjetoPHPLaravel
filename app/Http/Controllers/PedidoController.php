@@ -22,14 +22,14 @@ class PedidoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate($request, [
+        $request->validate([
             'cliente_id' => 'required|integer',
             'valor_total' => 'required|numeric',
         ]);
 
         $pedido = $this->pedidoService->createPedido($request->all());
 
-        return $pedido;
+        return response()->json($pedido, 201);
     }
 
     public function show(Pedido $pedido)
@@ -37,15 +37,18 @@ class PedidoController extends Controller
         return $pedido;
     }
 
-    public function update(Request $request, Pedido $pedido)
+    public function update(Request $request, $id)
     {
-        $request->validate($request, [
-            'valor_total' => 'required|numeric',
+        $pedido = Pedido::findOrFail($id);
+
+        $request->validate([
+            'cliente_id' => 'sometimes|numeric',
+            'valor_total' => 'sometimes|numeric',
         ]);
 
-        $pedido = $this->pedidoService->updatePedido($pedido, $request->all());
+        $pedido->update($request->all());
 
-        return $pedido;
+        return response()->json($pedido);
     }
 
     public function destroy(Pedido $pedido)

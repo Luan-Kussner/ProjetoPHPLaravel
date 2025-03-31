@@ -23,7 +23,7 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate($request, [
+        $request->validate([
             'nome' => 'required|string',
             'preco' => 'required|numeric',
             'estoque' => 'required|numeric',
@@ -32,7 +32,7 @@ class ProdutoController extends Controller
 
         $produto = $this->produtoService->createProduto($request->all());
 
-        return $produto;
+        return response()->json($produto, 201);
     }
 
     public function show(Produto $produto)
@@ -40,18 +40,20 @@ class ProdutoController extends Controller
         return $produto;
     }
 
-    public function update(Request $request, Produto $produto)
+    public function update(Request $request,$id)
     {
-        $request->validate($request, [
-            'nome' => 'required|string',
-            'preco' => 'required|numeric',
-            'estoque' => 'required|numeric',
-            'descricao' => 'required|string',
+        $produto = Produto::findOrFail($id);
+
+        $request->validate([
+            'nome' => 'sometimes|string',
+            'preco' => 'sometimes|numeric',
+            'estoque' => 'sometimes|numeric',
+            'descricao' => 'sometimes|string',
         ]);
 
-        $produto = $this->produtoService->updateProduto($produto, $request->all());
-
-        return $produto;
+        $produto->update($request->all());
+    
+        return response()->json($produto);
     }
 
     public function destroy(Produto $produto)

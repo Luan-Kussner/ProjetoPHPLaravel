@@ -12,7 +12,7 @@ class Produto extends Model
     protected $fillable = [
         'nome',
         'descricao',
-        'unidade_medida',
-        'valor_unitario',
+        'preco',
+        'estoque',
     ];
 }
