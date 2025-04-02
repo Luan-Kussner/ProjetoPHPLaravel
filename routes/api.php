@@ -12,7 +12,7 @@ Route::post('/v1/login', [AuthController::class, 'login']);
 Route::post('/v1/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
-    Route::middleware('admin')->group(function () {
+    Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
         Route::apiResource('/v1/clientes', ClienteController::class);
     });
 });
