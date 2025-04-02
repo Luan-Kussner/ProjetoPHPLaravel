@@ -23,11 +23,11 @@ class ProdutoRepository
 
     public function update(Produto $produto, array $data)
     {
-        $produto->update($data);
+        return $produto->update($data);
     }
 
     public function delete(Produto $produto)
     {
-        $produto->delete();
+        return $produto->delete();
     }
 }

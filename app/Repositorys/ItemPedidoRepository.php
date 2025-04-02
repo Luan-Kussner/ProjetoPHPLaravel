@@ -23,11 +23,11 @@ class ItemPedidoRepository
 
     public function update(ItemPedido $itemPedido, array $data)
     {
-        $itemPedido->update($data);
+        return $itemPedido->update($data);
     }
 
     public function delete(ItemPedido $itemPedido)
     {
-        $itemPedido->delete();
+        return $itemPedido->delete();
     }
 }
