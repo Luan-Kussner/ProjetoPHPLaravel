@@ -15,6 +15,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
         Route::apiResource('/v1/clientes', ClienteController::class);
     });
+    Route::post('/v1/logout', [AuthController::class, 'logout']);
+    Route::post('/v1/envia-codigo', [AuthController::class, 'envioCodigoDoisFatores']);
+    Route::post('/v1/verifica-codigo', [AuthController::class, 'verificacaoCodigoDoisFatores']);
 });
 
 Route::apiResource('/v1/pedidos', PedidoController::class);
