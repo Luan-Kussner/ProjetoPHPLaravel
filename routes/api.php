@@ -24,7 +24,6 @@ Route::apiResource('/v1/pedidos', PedidoController::class);
 Route::apiResource('/v1/itens-pedidos', ItemPedidoController::class);
 Route::apiResource('/v1/produtos', ProdutoController::class);
 
-// Rota do painel de administração, protegida com middleware de admin
 Route::middleware(['auth:sanctum', 'admin'])->get('v1/admin', function () {
     return "Bem-vindo, administrador!";
 });
