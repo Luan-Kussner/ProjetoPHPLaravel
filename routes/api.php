@@ -8,16 +8,16 @@ use App\Http\Controllers\ItemPedidoController;
 use App\Http\Controllers\PedidoController;
 use App\Http\Controllers\ProdutoController;
 
-Route::post('/v1/login', [AuthController::class, 'login']);
-Route::post('/v1/register', [AuthController::class, 'register']);
+Route::post('/v1/auth/login', [AuthController::class, 'login']);
+Route::post('/v1/auth/register', [AuthController::class, 'register']);
 
 Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
         Route::apiResource('/v1/clientes', ClienteController::class);
     });
-    Route::post('/v1/logout', [AuthController::class, 'logout']);
-    Route::post('/v1/envia-codigo', [AuthController::class, 'envioCodigoDoisFatores']);
-    Route::post('/v1/verifica-codigo', [AuthController::class, 'verificacaoCodigoDoisFatores']);
+    Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
+    Route::post('/v1/auth/envia-codigo', [AuthController::class, 'envioCodigoDoisFatores']);
+    Route::post('/v1/auth/verifica-codigo', [AuthController::class, 'verificacaoCodigoDoisFatores']);
 });
 
 Route::apiResource('/v1/pedidos', PedidoController::class);
