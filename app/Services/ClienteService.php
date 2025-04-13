@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Cliente;
 use App\Repositorys\ClienteRepository;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ClienteService
@@ -29,7 +30,11 @@ class ClienteService
 
     public function delete(Cliente $cliente)
     {
-        $this->clienteRepository->delete($cliente);
+        if ($cliente->objectkey && Storage::disk('public')->exists($cliente->objectkey)) {
+            Storage::disk('public')->delete($cliente->objectkey);
+        }
+
+        return $cliente->delete();
     }
 
     public function getAll()

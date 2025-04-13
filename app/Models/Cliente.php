@@ -16,5 +16,6 @@ class Cliente extends Model
         'endereco',
         'numero',
         'bairro',
+        'objectkey'
     ];
 }
