@@ -6,6 +6,7 @@ use App\Models\Cliente;
 use App\Services\ClienteService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class ClienteController extends Controller
 {
@@ -18,42 +19,62 @@ class ClienteController extends Controller
 
     public function index(Request $request)
     {
-        $pageSize = $request->input('pageSize', 10);
-        $clientes = Cliente::paginate($pageSize);
-
-        return response()->json([
-            'items' => $clientes->items(),
-            'totalItems' => $clientes->total(),
-            'totalPages' => $clientes->lastPage(),
-            'pageNumber' => $clientes->currentPage()
-        ]);
+        try {
+            $pageSize = (int) $request->input('pageSize', 10);
+    
+            if ($pageSize <= 0) {
+                return response()->json(['error' => 'O valor de pageSize deve ser maior que 0'], 400);
+            }
+    
+            $clientes = Cliente::paginate($pageSize);
+    
+            $clientes->getCollection()->transform(function ($cliente) {
+                if ($cliente->objectkey) {
+                    $cliente->objectkey = asset('storage/' . $cliente->objectkey);
+                }
+                return $cliente;
+            });
+    
+            return response()->json([
+                'items' => $clientes->items(),
+                'totalItems' => $clientes->total(),
+                'totalPages' => $clientes->lastPage(),
+                'pageNumber' => $clientes->currentPage(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao processar a requisição', 'message' => $e->getMessage()], 500);
+        }
     }
+    
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nome' => 'required|string',
-            'telefone' => 'required|string',
-            'endereco' => 'required|string',
-            'numero' => 'required|string',
-            'bairro' => 'required|string',
-            'objectkey' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
-        ]);
+        try {
+            $request->validate([
+                'nome' => 'required|string',
+                'telefone' => 'required|string',
+                'endereco' => 'required|string',
+                'numero' => 'required|string',
+                'bairro' => 'required|string',
+                'objectkey' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ]);
     
-        $data = $request->only(['nome', 'telefone', 'endereco', 'numero', 'bairro']);
+            $data = $request->only(['nome', 'telefone', 'endereco', 'numero', 'bairro']);
     
-        // Se veio imagem, salva no storage e adiciona ao $data
-        if ($request->hasFile('objectkey')) {
-            $path = $request->file('objectkey')->store('clientes', 'public'); // salva em storage/app/public/clientes
-            $data['objectkey'] = $path;
+            if ($request->hasFile('objectkey')) {
+                $path = $request->file('objectkey')->store('clientes', 'public');
+                $data['objectkey'] = $path;
+            }
+    
+            $cliente = $this->clienteService->createCliente($data);
+    
+            return response()->json($cliente, 201);
+        } catch (ValidationException $e) {
+            return response()->json($e->errors(), 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao salvar cliente', 'message' => $e->getMessage()], 500);
         }
-    
-        // Chama o service para salvar no banco
-        $cliente = $this->clienteService->createCliente($data);
-    
-        return response()->json($cliente, 201);
     }
-    
 
     public function show(Cliente $cliente)
     {
