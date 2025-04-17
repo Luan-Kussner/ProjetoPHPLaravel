@@ -78,8 +78,13 @@ class ClienteController extends Controller
 
     public function show(Cliente $cliente)
     {
-        return $cliente;
+        if ($cliente->objectkey) {
+            $cliente->objectkey = asset('storage/' . $cliente->objectkey);
+        }
+    
+        return response()->json($cliente);
     }
+    
 
     public function update(Request $request, $id)
     {
