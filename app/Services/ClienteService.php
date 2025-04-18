@@ -69,4 +69,9 @@ class ClienteService
             throw ValidationException::withMessages(['bairro' => 'O Bairro é obrigatório.']);
         }
     }
+
+    public function findByName($nome)
+    {
+        return $this->clienteRepository->findByName($nome);
+    }
 }

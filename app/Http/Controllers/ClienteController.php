@@ -122,4 +122,22 @@ class ClienteController extends Controller
 
         return response()->json(['message' => 'Cliente excluído com sucesso.'], 200);
     }
+
+    public function findByName(Request $request)
+    {
+        try {
+            $nome = $request->input('nome');
+            $clientes = $this->clienteService->findByName($nome);
+    
+            foreach ($clientes as &$cliente) {
+                if (!empty($cliente['objectkey'])) {
+                    $cliente['objectkey'] = asset('storage/' . $cliente['objectkey']);
+                }
+            }
+    
+            return response()->json($clientes);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao buscar clientes', 'message' => $e->getMessage()], 500);
+        }
+    }
 }

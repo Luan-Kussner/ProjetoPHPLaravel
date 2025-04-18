@@ -30,4 +30,9 @@ class ClienteRepository
     {
        return $cliente->delete();
     }
+
+    public function findByName($nome)
+    {
+        return Cliente::where('nome', 'like', '%' . $nome . '%')->get();
+    }
 }
