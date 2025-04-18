@@ -123,7 +123,7 @@ class ClienteController extends Controller
         return response()->json(['message' => 'Cliente excluído com sucesso.'], 200);
     }
 
-    public function findByName(Request $request)
+    public function getfindByName(Request $request)
     {
         try {
             $nome = $request->input('nome');
