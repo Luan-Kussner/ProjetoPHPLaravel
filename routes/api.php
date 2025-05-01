@@ -16,6 +16,8 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::middleware([\App\Http\Middleware\AdminMiddleware::class])->group(function () {
         Route::apiResource('/v1/clientes', ClienteController::class);
         Route::post('/v1/clientes/find-by-name', [ClienteController::class, 'getFindByName']);
+        Route::apiResource('/v1/produtos', ProdutoController::class);
+        Route::post('/v1/produtos/find-by-name', [ProdutoController::class, 'getFindByName']);
     });
     Route::post('/v1/auth/logout', [AuthController::class, 'logout']);
     Route::post('/v1/auth/envia-codigo', [AuthController::class, 'envioCodigoDoisFatores']);
@@ -27,9 +29,9 @@ Route::middleware('auth:sanctum')->group(function () {
 
 Route::apiResource('/v1/pedidos', PedidoController::class);
 Route::apiResource('/v1/itens-pedidos', ItemPedidoController::class);
-Route::apiResource('/v1/produtos', ProdutoController::class);
 Route::get('/v1/dashboards', [DashboardsController::class, 'get']);
-// Route::apiResource('/v1/clientes', ClienteController::class);
+// Route::apiResource('/v1/produtos', ProdutoController::class); // comentado para teste sem autorização
+// Route::apiResource('/v1/clientes', ClienteController::class); // comentado para teste sem autorização
 
 Route::middleware(['auth:sanctum', 'admin'])->get('v1/admin', function () {
     return "Bem-vindo, administrador!";

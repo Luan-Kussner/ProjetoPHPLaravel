@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Models\Produto;
 use App\Repositorys\ProdutoRepository;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 
 class ProdutoService
@@ -29,7 +30,12 @@ class ProdutoService
 
     public function delete(Produto $produto)
     {
-        $this->produtoRepository->delete($produto);
+        if ($produto->objectkey && Storage::disk('public')->exists($produto->objectkey)) {
+            Storage::disk('public')->delete($produto->objectkey);
+        }
+
+        return $produto->delete();
+
     }
 
     public function getAll()
@@ -59,5 +65,10 @@ class ProdutoService
         if (!$data['descricao']) {
             throw ValidationException::withMessages(['descricao' => 'A Descrição do Produto é obrigatório.']);
         }
+    }
+
+    public function findByName($nome)
+    {
+        return $this->produtoRepository->findByName($nome);
     }
 }

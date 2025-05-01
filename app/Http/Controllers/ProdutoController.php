@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Models\Produto;
 use App\Services\ProdutoService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class ProdutoController extends Controller
 {
@@ -28,6 +30,9 @@ class ProdutoController extends Controller
             $produtos = Produto::paginate($pageSize);
     
             $produtos->getCollection()->transform(function ($produto) {
+                if ($produto->objectkey) {
+                    $produto->objectkey = asset('storage/' . $produto->objectkey);
+                }
                 return $produto;
             });
     
@@ -45,21 +50,39 @@ class ProdutoController extends Controller
 
     public function store(Request $request)
     {
-        $request->validate([
-            'nome' => 'required|string',
-            'preco' => 'required|numeric',
-            'estoque' => 'required|numeric',
-            'descricao' => 'required|string',
-        ]);
+        try {
+            $request->validate([
+                'nome' => 'required|string',
+                'preco' => 'required|numeric',
+                'estoque' => 'required|numeric',
+                'descricao' => 'required|string',
+                'objectkey' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
+            ]);
+            
+            $data = $request->only(['nome', 'preco', 'estoque', 'descricao']);
+        
+            if ($request->hasFile('objectkey')) {
+                $path = $request->file('objectkey')->store('produtos', 'public');
+                $data['objectkey'] = $path;
+            }
 
-        $produto = $this->produtoService->createProduto($request->all());
+            $produto = $this->produtoService->createProduto($data);
 
-        return response()->json($produto, 201);
+            return response()->json($produto, 201);
+        } catch (ValidationException $e) {
+            return response()->json($e->errors(), 422);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao salvar cliente', 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function show(Produto $produto)
     {
-        return $produto;
+        if ($produto->objectkey) {
+            $produto->objectkey = asset('storage/' . $produto->objectkey);
+        }
+    
+        return response()->json($produto);
     }
 
     public function update(Request $request,$id)
@@ -71,10 +94,23 @@ class ProdutoController extends Controller
             'preco' => 'sometimes|numeric',
             'estoque' => 'sometimes|numeric',
             'descricao' => 'sometimes|string',
+            'objectkey' => 'nullable|image|mimes:jpeg,png,jpg|max:2048'
         ]);
+        
+        $data = $request->all();
 
-        $produto->update($request->all());
-    
+        if ($request->hasFile('objectkey')) {
+
+            if ($produto->objectkey && Storage::disk('public')->exists($produto->objectkey)) {
+                Storage::disk('public')->delete($produto->objectkey);
+            }
+
+            $path = $request->file('objectkey')->store('produtos', 'public');
+            $data['objectkey'] = $path;
+        }
+
+        $produto->update($data);
+
         return response()->json($produto);
     }
 
@@ -83,5 +119,23 @@ class ProdutoController extends Controller
         $this->produtoService->delete($produto);
 
         return response()->json(['message' => 'Produto excluído com sucesso.'], 200);
+    }
+
+    public function getfindByName(Request $request)
+    {
+        try {
+            $nome = $request->input('nome');
+            $produtos = $this->produtoService->findByName($nome);
+    
+            foreach ($produtos as &$produto) {
+                if (!empty($produto['objectkey'])) {
+                    $produto['objectkey'] = asset('storage/' . $produto['objectkey']);
+                }
+            }
+    
+            return response()->json($produtos);
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao buscar produtos', 'message' => $e->getMessage()], 500);
+        }
     }
 }

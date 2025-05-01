@@ -30,4 +30,9 @@ class ProdutoRepository
     {
         return $produto->delete();
     }
+
+    public function findByName($nome)
+    {
+        return Produto::where('nome', 'like', '%' . $nome . '%')->get();
+    }
 }

@@ -14,5 +14,6 @@ class Produto extends Model
         'descricao',
         'preco',
         'estoque',
+        'objectkey'
     ];
 }
