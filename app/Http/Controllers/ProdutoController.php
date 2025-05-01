@@ -16,9 +16,31 @@ class ProdutoController extends Controller
         $this->produtoService = $produtoService;
     }
 
-    public function index()
+    public function index(Request $request)
     {
-        return Produto::all();
+        try {
+            $pageSize = (int) $request->input('pageSize', 10);
+    
+            if ($pageSize <= 0) {
+                return response()->json(['error' => 'O valor de pageSize deve ser maior que 0'], 400);
+            }
+    
+            $produtos = Produto::paginate($pageSize);
+    
+            $produtos->getCollection()->transform(function ($produto) {
+                return $produto;
+            });
+    
+            return response()->json([
+                'items' => $produtos->items(),
+                'totalItems' => $produtos->total(),
+                'totalPages' => $produtos->lastPage(),
+                'pageNumber' => $produtos->currentPage(),
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json(['error' => 'Erro ao processar a requisição', 'message' => $e->getMessage()], 500);
+        }
     }
 
     public function store(Request $request)
