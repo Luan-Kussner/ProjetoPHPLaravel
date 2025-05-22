@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -21,6 +22,13 @@ class Pedido extends Model
         'status' => 'integer',
         'data_pedido' => 'datetime',
     ];
+    protected $appends = ['status_formatado'];
+    protected function statusFormatado(): Attribute
+    {
+        return Attribute::get(function ($value, $attributes) {
+            return $attributes['status'] == 1 ? 'Sim' : 'Não';
+        });
+    }
 
     public function cliente()
     {

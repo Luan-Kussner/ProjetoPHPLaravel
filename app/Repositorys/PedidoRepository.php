@@ -8,7 +8,7 @@ class PedidoRepository
 {
     public function getAll()
     {
-        return Pedido::all();
+        return Pedido::with('cliente:id,nome')->get();
     }
 
     public function getById($id)

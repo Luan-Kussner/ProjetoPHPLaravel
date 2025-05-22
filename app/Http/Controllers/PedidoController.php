@@ -17,7 +17,9 @@ class PedidoController extends Controller
 
     public function index()
     {
-        return Pedido::all();
+       $pedidos = $this->pedidoService->getAll();
+
+        return response()->json($pedidos);
     }
 
     public function store(Request $request)
